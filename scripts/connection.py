@@ -42,3 +42,29 @@ def outputHotShortComments(ip_list, subjectId, fileName, headers):
                 rating, userid, time = getRatingCommentsDetail(info)
                 f.write(rating + "\t"  + userid + "\t" + time + '\n')
             page+=20
+
+
+def getUserAllRatings(userId, ip_list, headers):
+    # 爬取某个用户的所有短评打分,如果只有短评则返回未评分
+    fpath = "output/ratings/" + userId + ".txt"
+    with open(fpath, 'a', encoding='utf-8') as f:
+        page = 0
+        count = 1
+        while count > 0:
+            url = "https://movie.douban.com/people/" + userId + "/collect?start=" + str(page) + "&sort=time&rating=all&filter=all&mode=list"
+            proxies = get_random_ip(ip_list)
+            r = requests.get(url=url, headers=headers, proxies = proxies)
+            print('正在处理: %s' % url)
+            statusCode(r)
+            data = r.content.decode('utf-8')
+            soup = BeautifulSoup(data, 'html.parser')
+            rating_info = soup.find_all('li', class_='item')
+            count = len(rating_info)
+            for info in rating_info:
+                (info.find("a")["href"])
+                try:
+                    f.write(info.find("a")["href"] + "\t" + info.find("div", class_='date').find("span")['class'][0] + '\n')
+                except:
+                    f.write(info.find("a")["href"] + "\t" + "未打分" + '\n')
+            page += 30
+    f.close()
